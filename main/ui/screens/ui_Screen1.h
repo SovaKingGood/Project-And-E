@@ -14,20 +14,23 @@ extern "C" {
 extern void ui_Screen1_screen_init(void);
 extern void ui_Screen1_screen_destroy(void);
 extern lv_obj_t * ui_Screen1;
-extern lv_obj_t * ui_Bar1;
-extern lv_obj_t * ui_AndE;
+extern lv_obj_t * ui_AndEImage;
 extern lv_obj_t * ui_Buttons;
-extern lv_obj_t * ui_DriveButton;
-extern lv_obj_t * ui_DriveLabel;
-extern lv_obj_t * ui_SettingsButton;
-extern lv_obj_t * ui_SettingsLabel;
 extern void ui_event_InfoButton(lv_event_t * e);
 extern lv_obj_t * ui_InfoButton;
-extern lv_obj_t * ui_InfoLabel;
+extern lv_obj_t * ui_InfoImage;
+extern lv_obj_t * ui_SettingsButton;
+extern lv_obj_t * ui_SettingsImage;
+extern void ui_event_StartButton(lv_event_t * e);
+extern lv_obj_t * ui_StartButton;
+extern lv_obj_t * ui_StartImage;
 // CUSTOM VARIABLES
-extern lv_obj_t * uic_DriveButton;
-extern lv_obj_t * uic_SettingsButton;
+extern lv_obj_t * uic_AndEImage;
 extern lv_obj_t * uic_InfoButton;
+extern lv_obj_t * uic_InfoImage;
+extern lv_obj_t * uic_SettingsButton;
+extern lv_obj_t * uic_SettingsImage;
+extern lv_obj_t * uic_StartImage;
 
 #ifdef __cplusplus
 } /*extern "C"*/

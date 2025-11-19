@@ -22,6 +22,7 @@ extern "C" {
 
 #include "screens/ui_Screen1.h"
 #include "screens/ui_Screen2.h"
+#include "screens/ui_Screen3.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -29,6 +30,13 @@ extern "C" {
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
+
+// IMAGES AND IMAGE SETS
+LV_IMG_DECLARE(ui_img_945321139);    // assets/And-E_AI.png
+LV_IMG_DECLARE(ui_img_686816875);    // assets/icons8-info-48.png
+LV_IMG_DECLARE(ui_img_1471171794);    // assets/icons8-settings-48.png
+LV_IMG_DECLARE(ui_img_836209702);    // assets/icons8-start-button-64.png
+LV_IMG_DECLARE(ui_img_1577682898);    // assets/icons8-home-24.png
 
 // FONTS
 LV_FONT_DECLARE(ui_font_Chokokutai);

@@ -1,6 +1,7 @@
 #include "espnow_task.h"
 #include "system_config.h"
 #include "esp_log.h"
+#include "display.h"
 #define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
 #include "esp_wifi.h"
@@ -67,6 +68,9 @@ static void espnow_recv_cb(const esp_now_recv_info_t *ri, const uint8_t *data, i
             last_telem = t;
             /* Update telemetry reception timestamp for connection detection */
             last_telemetry_received = esp_timer_get_time() / 1000;
+
+            /* Push latest telemetry into UI model (no LVGL calls here) */
+            display_set_telemetry_state(&t);
 
             ESP_LOGI(TAG, "📡 Telemetry received: rpm=%ld batt=%.2fV gyro=(%.1f,%.1f,%.1f) accel=(%.3f,%.3f,%.3f)",
                      (long)t.rpm, (double)t.batt_mv/1000.0,
@@ -161,6 +165,8 @@ void espnow_update_controller_data(const espnow_controller_data_t* data) {
     if (xSemaphoreTake(data_mutex, 0) == pdTRUE) {
         current_data = *data;
         data_updated = true;
+        /* Push latest controller state into UI model for Screen2 display (no LVGL calls here) */
+        display_set_controller_state(&current_data);
         xSemaphoreGive(data_mutex);
     }
 }

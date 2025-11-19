@@ -50,6 +50,13 @@ int app_main(void) {
 #endif
 #endif
 
+    /* Log initial heap */
+    printf("\n");
+    printf("╔════════════════════════════════════════════════════════════╗\n");
+    printf("║  INITIAL HEAP: %u bytes free                              \n", (unsigned)esp_get_free_heap_size());
+    printf("╚════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
+
     /* Display */
     ESP_ERROR_CHECK(display_init());
 
@@ -69,6 +76,13 @@ int app_main(void) {
     ESP_ERROR_CHECK(espnow_task_start());
 #endif
 
+    /* Log heap before Bluetooth init */
+    printf("\n");
+    printf("╔════════════════════════════════════════════════════════════╗\n");
+    printf("║  HEAP BEFORE BLUETOOTH: %u bytes free                     \n", (unsigned)esp_get_free_heap_size());
+    printf("╚════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
+
     /* Bluepad/BTstack - init after all peripherals ready */
     btstack_init();
     
@@ -77,6 +91,13 @@ int app_main(void) {
     
     /* Init Bluepad32 */
     uni_init(0, NULL);
+    
+    /* Log heap after Bluetooth init */
+    printf("\n");
+    printf("╔════════════════════════════════════════════════════════════╗\n");
+    printf("║  HEAP AFTER BLUETOOTH: %u bytes free                      \n", (unsigned)esp_get_free_heap_size());
+    printf("╚════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
     
     /* This blocks forever running Bluetooth event loop */
     btstack_run_loop_execute();

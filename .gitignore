@@ -1,0 +1,65 @@
+# ESP-IDF Build artifacts
+build/
+sdkconfig.old
+sdkconfig.old.*
+
+# Managed components (managed by idf_component_manager)
+managed_components/
+
+# Dependencies lock file (can be regenerated)
+dependencies.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# Logs
+*.log
+
+# Compiled files
+*.o
+*.a
+*.elf
+*.bin
+*.map
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+!CMakeLists.txt
+
+# Partition table binaries
+partition-table.bin
+
+# Flash args
+*flash_args
+flasher_args.json
+
+# IDE cache files
+.cache/
+

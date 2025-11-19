@@ -5,26 +5,37 @@
 
 #include "../ui.h"
 
-lv_obj_t * uic_InfoButton;
+lv_obj_t * uic_StartImage;
+lv_obj_t * uic_SettingsImage;
 lv_obj_t * uic_SettingsButton;
-lv_obj_t * uic_DriveButton;
+lv_obj_t * uic_InfoImage;
+lv_obj_t * uic_InfoButton;
+lv_obj_t * uic_AndEImage;
 lv_obj_t * ui_Screen1 = NULL;
-lv_obj_t * ui_Bar1 = NULL;
-lv_obj_t * ui_AndE = NULL;
+lv_obj_t * ui_AndEImage = NULL;
 lv_obj_t * ui_Buttons = NULL;
-lv_obj_t * ui_DriveButton = NULL;
-lv_obj_t * ui_DriveLabel = NULL;
-lv_obj_t * ui_SettingsButton = NULL;
-lv_obj_t * ui_SettingsLabel = NULL;
 lv_obj_t * ui_InfoButton = NULL;
-lv_obj_t * ui_InfoLabel = NULL;
+lv_obj_t * ui_InfoImage = NULL;
+lv_obj_t * ui_SettingsButton = NULL;
+lv_obj_t * ui_SettingsImage = NULL;
+lv_obj_t * ui_StartButton = NULL;
+lv_obj_t * ui_StartImage = NULL;
 // event funtions
 void ui_event_InfoButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Screen2_screen_init);
+        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_Screen2_screen_init);
+    }
+}
+
+void ui_event_StartButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_Screen3_screen_init);
     }
 }
 
@@ -42,49 +53,16 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_bg_grad_stop(ui_Screen1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui_Screen1, LV_GRAD_DIR_VER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Bar1 = lv_bar_create(ui_Screen1);
-    lv_bar_set_value(ui_Bar1, 25, LV_ANIM_OFF);
-    lv_bar_set_start_value(ui_Bar1, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_Bar1, 200);
-    lv_obj_set_height(ui_Bar1, 21);
-    lv_obj_set_x(ui_Bar1, 0);
-    lv_obj_set_y(ui_Bar1, -67);
-    lv_obj_set_align(ui_Bar1, LV_ALIGN_CENTER);
-    lv_obj_set_style_radius(ui_Bar1, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_Bar1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Bar1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_color(ui_Bar1, lv_color_hex(0x1884FF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_opa(ui_Bar1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui_Bar1, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_pad(ui_Bar1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_color(ui_Bar1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_Bar1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_Bar1, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_Bar1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_bg_color(ui_Bar1, lv_color_hex(0xE1B305), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Bar1, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui_Bar1, lv_color_hex(0xFFD750), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui_Bar1, 0, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui_Bar1, 50, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui_Bar1, LV_GRAD_DIR_HOR, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_Bar1, lv_color_hex(0xFFFFFF), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_Bar1, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_Bar1, 2, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-
-    //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
-    if(lv_obj_get_style_pad_top(ui_Bar1, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_Bar1,
-                                                                                           lv_obj_get_style_pad_right(ui_Bar1, LV_PART_MAIN) + 1, LV_PART_MAIN);
-    ui_AndE = lv_label_create(ui_Screen1);
-    lv_obj_set_width(ui_AndE, LV_SIZE_CONTENT);   /// 27
-    lv_obj_set_height(ui_AndE, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_AndE, 0);
-    lv_obj_set_y(ui_AndE, -104);
-    lv_obj_set_align(ui_AndE, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_AndE, "And-E");
-    lv_obj_set_style_text_color(ui_AndE, lv_color_hex(0xFFDE00), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_AndE, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_AndE, &ui_font_Chokokutai, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_AndEImage = lv_image_create(ui_Screen1);
+    lv_image_set_src(ui_AndEImage, &ui_img_945321139);
+    lv_obj_set_width(ui_AndEImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AndEImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AndEImage, 0);
+    lv_obj_set_y(ui_AndEImage, -39);
+    lv_obj_set_align(ui_AndEImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_AndEImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_AndEImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_image_set_scale(ui_AndEImage, 80);
 
     ui_Buttons = lv_obj_create(ui_Screen1);
     lv_obj_set_width(ui_Buttons, 328);
@@ -103,129 +81,96 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_outline_width(ui_Buttons, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_outline_pad(ui_Buttons, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_DriveButton = lv_button_create(ui_Buttons);
-    lv_obj_set_width(ui_DriveButton, 120);
-    lv_obj_set_height(ui_DriveButton, 50);
-    lv_obj_set_x(ui_DriveButton, 1);
-    lv_obj_set_y(ui_DriveButton, -40);
-    lv_obj_set_align(ui_DriveButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_DriveButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_DriveButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_radius(ui_DriveButton, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_DriveButton, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_DriveButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui_DriveButton, lv_color_hex(0xFFEA11), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui_DriveButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui_DriveButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui_DriveButton, LV_GRAD_DIR_HOR, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_color(ui_DriveButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_opa(ui_DriveButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui_DriveButton, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_pad(ui_DriveButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_color(ui_DriveButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_DriveButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_DriveButton, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_DriveButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_offset_x(ui_DriveButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_offset_y(ui_DriveButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_DriveLabel = lv_label_create(ui_DriveButton);
-    lv_obj_set_width(ui_DriveLabel, LV_SIZE_CONTENT);   /// 27
-    lv_obj_set_height(ui_DriveLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_DriveLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_DriveLabel, "Drive");
-    lv_obj_set_style_text_color(ui_DriveLabel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_DriveLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_DriveLabel, &ui_font_Chokokutai, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_DriveLabel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_DriveLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_DriveLabel, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(ui_DriveLabel, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_SettingsButton = lv_button_create(ui_Buttons);
-    lv_obj_set_width(ui_SettingsButton, 90);
-    lv_obj_set_height(ui_SettingsButton, 50);
-    lv_obj_set_x(ui_SettingsButton, -100);
-    lv_obj_set_y(ui_SettingsButton, 40);
-    lv_obj_set_align(ui_SettingsButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SettingsButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_SettingsButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_radius(ui_SettingsButton, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_SettingsButton, lv_color_hex(0x868686), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_SettingsButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui_SettingsButton, lv_color_hex(0x060606), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui_SettingsButton, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui_SettingsButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui_SettingsButton, LV_GRAD_DIR_VER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_color(ui_SettingsButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_opa(ui_SettingsButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui_SettingsButton, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_pad(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_color(ui_SettingsButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_SettingsButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_SettingsButton, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_offset_x(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_offset_y(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_SettingsLabel = lv_label_create(ui_SettingsButton);
-    lv_obj_set_height(ui_SettingsLabel, 21);
-    lv_obj_set_width(ui_SettingsLabel, LV_SIZE_CONTENT);   /// 27
-    lv_obj_set_align(ui_SettingsLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_SettingsLabel, "Settings");
-    lv_obj_set_style_text_color(ui_SettingsLabel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_SettingsLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui_SettingsLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_SettingsLabel, &ui_font_Chokokutai, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui_SettingsLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_SettingsLabel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_SettingsLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_SettingsLabel, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(ui_SettingsLabel, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     ui_InfoButton = lv_button_create(ui_Buttons);
-    lv_obj_set_width(ui_InfoButton, 90);
-    lv_obj_set_height(ui_InfoButton, 50);
-    lv_obj_set_x(ui_InfoButton, 100);
-    lv_obj_set_y(ui_InfoButton, 40);
+    lv_obj_set_width(ui_InfoButton, 103);
+    lv_obj_set_height(ui_InfoButton, 92);
+    lv_obj_set_x(ui_InfoButton, 104);
+    lv_obj_set_y(ui_InfoButton, 44);
     lv_obj_set_align(ui_InfoButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_InfoButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_InfoButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_radius(ui_InfoButton, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_InfoButton, lv_color_hex(0xC44DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_InfoButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui_InfoButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui_InfoButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui_InfoButton, LV_GRAD_DIR_VER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_InfoButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_outline_color(ui_InfoButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_opa(ui_InfoButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui_InfoButton, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_pad(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_color(ui_InfoButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_InfoButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_InfoButton, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_offset_x(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_offset_y(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_InfoButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_InfoLabel = lv_label_create(ui_InfoButton);
-    lv_obj_set_width(ui_InfoLabel, LV_SIZE_CONTENT);   /// 27
-    lv_obj_set_height(ui_InfoLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_InfoLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_InfoLabel, "Info");
-    lv_obj_set_style_text_color(ui_InfoLabel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_InfoLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_InfoLabel, &ui_font_Chokokutai, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_InfoLabel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_InfoLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_InfoLabel, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(ui_InfoLabel, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_InfoImage = lv_image_create(ui_InfoButton);
+    lv_image_set_src(ui_InfoImage, &ui_img_686816875);
+    lv_obj_set_width(ui_InfoImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_InfoImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InfoImage, 12);
+    lv_obj_set_y(ui_InfoImage, 0);
+    lv_obj_set_align(ui_InfoImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_InfoImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_InfoImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_image_set_scale(ui_InfoImage, 310);
+
+    ui_SettingsButton = lv_button_create(ui_Buttons);
+    lv_obj_set_width(ui_SettingsButton, 103);
+    lv_obj_set_height(ui_SettingsButton, 92);
+    lv_obj_set_x(ui_SettingsButton, -106);
+    lv_obj_set_y(ui_SettingsButton, 44);
+    lv_obj_set_align(ui_SettingsButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SettingsButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_SettingsButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_SettingsButton, lv_color_hex(0xC44DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_SettingsButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_color(ui_SettingsButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_SettingsButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_SettingsButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_SettingsImage = lv_image_create(ui_SettingsButton);
+    lv_image_set_src(ui_SettingsImage, &ui_img_1471171794);
+    lv_obj_set_width(ui_SettingsImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SettingsImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_SettingsImage, -13);
+    lv_obj_set_y(ui_SettingsImage, 0);
+    lv_obj_set_align(ui_SettingsImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SettingsImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_SettingsImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_StartButton = lv_button_create(ui_Buttons);
+    lv_obj_set_width(ui_StartButton, 103);
+    lv_obj_set_height(ui_StartButton, 92);
+    lv_obj_set_x(ui_StartButton, 1);
+    lv_obj_set_y(ui_StartButton, 44);
+    lv_obj_set_align(ui_StartButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_StartButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_StartButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_StartButton, lv_color_hex(0xC44DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_StartButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_StartButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_StartButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_color(ui_StartButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_StartButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_StartButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_StartButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_StartImage = lv_image_create(ui_StartButton);
+    lv_image_set_src(ui_StartImage, &ui_img_836209702);
+    lv_obj_set_width(ui_StartImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_StartImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_StartImage, 1);
+    lv_obj_set_y(ui_StartImage, 0);
+    lv_obj_set_align(ui_StartImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_StartImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_StartImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     lv_obj_add_event_cb(ui_InfoButton, ui_event_InfoButton, LV_EVENT_ALL, NULL);
-    uic_DriveButton = ui_DriveButton;
-    uic_SettingsButton = ui_SettingsButton;
+    lv_obj_add_event_cb(ui_StartButton, ui_event_StartButton, LV_EVENT_ALL, NULL);
+    uic_AndEImage = ui_AndEImage;
     uic_InfoButton = ui_InfoButton;
+    uic_InfoImage = ui_InfoImage;
+    uic_SettingsButton = ui_SettingsButton;
+    uic_SettingsImage = ui_SettingsImage;
+    uic_StartImage = ui_StartImage;
 
 }
 
@@ -235,17 +180,19 @@ void ui_Screen1_screen_destroy(void)
 
     // NULL screen variables
     ui_Screen1 = NULL;
-    ui_Bar1 = NULL;
-    ui_AndE = NULL;
+    uic_AndEImage = NULL;
+    ui_AndEImage = NULL;
     ui_Buttons = NULL;
-    uic_DriveButton = NULL;
-    ui_DriveButton = NULL;
-    ui_DriveLabel = NULL;
-    uic_SettingsButton = NULL;
-    ui_SettingsButton = NULL;
-    ui_SettingsLabel = NULL;
     uic_InfoButton = NULL;
     ui_InfoButton = NULL;
-    ui_InfoLabel = NULL;
+    uic_InfoImage = NULL;
+    ui_InfoImage = NULL;
+    uic_SettingsButton = NULL;
+    ui_SettingsButton = NULL;
+    uic_SettingsImage = NULL;
+    ui_SettingsImage = NULL;
+    ui_StartButton = NULL;
+    uic_StartImage = NULL;
+    ui_StartImage = NULL;
 
 }

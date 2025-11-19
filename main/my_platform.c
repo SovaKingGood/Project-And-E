@@ -1,5 +1,8 @@
 #include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include <uni.h>
 #include "espnow_task.h"
 #include "display.h"
@@ -24,8 +27,10 @@ static void my_platform_init(int argc, const char** argv) {
 }
 
 static void my_platform_on_init_complete(void) {
-    uni_bt_start_scanning_and_autoconnect_unsafe();
+    ESP_LOGI("PLAT", "🔵 Bluetooth init complete");
+    
     uni_bt_allow_incoming_connections(true);
+    uni_bt_start_scanning_and_autoconnect_unsafe();
     uni_bt_del_keys_unsafe();
 }
 
@@ -36,15 +41,25 @@ static uni_error_t my_platform_on_device_discovered(bd_addr_t addr, const char* 
 }
 
 static void my_platform_on_device_connected(uni_hid_device_t* d) {
+    extern uint32_t esp_get_free_heap_size(void);
     (void)d;
     connected_controller_count++;
-    ESP_LOGI("PLAT", "✅ Controller connected successfully! count=%d", connected_controller_count);
+    printf("\n");
+    printf("╔════════════════════════════════════════════════════════════╗\n");
+    printf("║  ✅ CONTROLLER CONNECTED! Heap: %u bytes free            \n", (unsigned)esp_get_free_heap_size());
+    printf("╚════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
 }
 
 static void my_platform_on_device_disconnected(uni_hid_device_t* d) {
+    extern uint32_t esp_get_free_heap_size(void);
     (void)d;
     if (connected_controller_count > 0) connected_controller_count--;
-    ESP_LOGI("PLAT", "❌ Controller disconnected, count=%d", connected_controller_count);
+    printf("\n");
+    printf("╔════════════════════════════════════════════════════════════╗\n");
+    printf("║  ❌ CONTROLLER DISCONNECTED! Heap: %u bytes free         \n", (unsigned)esp_get_free_heap_size());
+    printf("╚════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
     ESP_LOGI("PLAT", "If reconnecting fails, ensure controller is disconnected from PS4/other devices");
 }
 
@@ -88,7 +103,7 @@ static void my_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
             .accel_z = (int16_t)gp->accel[2],
 
             .controller_battery = ctl->battery,
-            .drive_mode   = DRIVE_MODE_PARK,  /* may be overridden by UI */
+            .drive_mode   = DRIVE_MODE_PARK,
             .park_request = 0,
             .source       = CTRL_SOURCE_CONTROLLER,
 
@@ -96,21 +111,9 @@ static void my_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
             .checksum  = 0
         };
 
-        /* Example: long-press "select" -> park_request (adjust to taste) */
         if (gp->misc_buttons & 0x01) controller_data.park_request = 1;
 
         espnow_update_controller_data(&controller_data);
-
-        /* Motion data is constantly changing; avoid change-threshold logging to reduce spam. */
-
-        /* UI side (optional): you already have a label task that reads via espnow_get_current_controller_data() */
-        display_update_controller_data(
-            ctl->battery,
-            gp->buttons,
-            gp->axis_x, gp->axis_y,
-            gp->axis_rx, gp->axis_ry,
-            gp->brake, gp->throttle
-        );
     }
 }
 
@@ -133,7 +136,6 @@ static void trigger_event_on_gamepad(uni_hid_device_t* d) {
     if (d->report_parser.set_lightbar_color)  d->report_parser.set_lightbar_color(d, 0x10, 0x10, 0x30);
 }
 
-/* Entry */
 struct uni_platform* get_my_platform(void) {
     static struct uni_platform plat = {
         .name = "custom",

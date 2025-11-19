@@ -1,0 +1,84 @@
+#
+# ESP32 options
+#
+# Optimize for SIZE not performance to fit in memory
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+# CONFIG_COMPILER_OPTIMIZATION_PERF is not set
+
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+CONFIG_ESP32_XTAL_FREQ_AUTO=y
+CONFIG_XTAL_FREQ_AUTO=y
+
+# NO PSRAM on this board
+# CONFIG_SPIRAM is not set
+# CONFIG_ESP32_SPIRAM_SUPPORT is not set
+
+# Bluetooth related (match working Bluepad32 example, adjusted for no PSRAM)
+CONFIG_BT_ENABLED=y
+CONFIG_BT_CONTROLLER_ONLY=y
+# Host stacks: Bluepad32 uses its own BTstack backend, disable IDF hosts
+# (matches working example: lines 480-483)
+# CONFIG_BT_BLUEDROID_ENABLED is not set
+# CONFIG_BT_NIMBLE_ENABLED is not set
+# Controller: BR/EDR only, BLE disabled
+#CONFIG_BTDM_CTRL_MODE_BTDM=y
+CONFIG_BTDM_CTRL_MODE_BR_EDR_ONLY=y
+# Max ACL connections: 1 (same as working example, enough for 1 DS4)
+CONFIG_BTDM_CTRL_BR_EDR_MAX_ACL_CONN=1
+CONFIG_BTDM_CTRL_BR_EDR_MAX_SYNC_CONN=0
+# Vendor auth events enabled (as in working example)
+CONFIG_BTDM_CTRL_LEGACY_AUTH_VENDOR_EVT=y
+# No modem sleep / auto latency for lowest latency
+CONFIG_BTDM_CTRL_AUTO_LATENCY=n
+CONFIG_BTDM_CTRL_MODEM_SLEEP=n
+# HCI host buffers (keep 4 like before)
+CONFIG_BT_ACL_CONNECTIONS=4
+
+# LVGL memory + draw settings (match previous stable config, low DRAM use)
+CONFIG_LV_MEM_SIZE_KILOBYTES=32
+CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES=0
+CONFIG_LV_USE_CLIB_MALLOC=y
+# CONFIG_LV_USE_BUILTIN_MALLOC is not set
+CONFIG_LV_DRAW_LAYER_SIMPLE_BUF_SIZE=8192
+
+CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH=y
+
+#
+# FreeRTOS
+#
+CONFIG_FREERTOS_HZ=1000
+# Increase watchdog timeout for heavy LVGL rendering
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=20
+# Optimize scheduler for real-time performance
+CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y
+# Enable FreeRTOS stats formatting functions, needed for 'tasks' console command
+CONFIG_FREERTOS_USE_TRACE_FACILITY=y
+CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS=y
+
+#
+# Bluepad32 options
+#
+CONFIG_BLUEPAD32_MAX_DEVICES=1
+CONFIG_BLUEPAD32_PLATFORM_CUSTOM=y
+# Enable GAP security: required for DS4 / modern pads (matches working example)
+CONFIG_BLUEPAD32_GAP_SECURITY=y
+CONFIG_BLUEPAD32_MAX_ALLOWLIST=1
+
+#
+# BTstack options
+# Needs to be disabled for ESP32-C6
+# See: https://github.com/bluekitchen/btstack/issues/599
+#
+CONFIG_BTSTACK_AUDIO=n
+
+#
+# XPT2046 Touch Controller Options
+#
+CONFIG_XPT2046_INTERRUPT_MODE=y
+CONFIG_XPT2046_Z_THRESHOLD=100
+CONFIG_XPT2046_CONVERT_ADC_TO_COORDS=y
+
+#
+# Add here other options
+#

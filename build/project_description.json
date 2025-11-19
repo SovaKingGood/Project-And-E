@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "bluepad32_esp32_example_app",
-    "project_version":    "1",
+    "project_version":    "a4d29d4-dirty",
     "project_path":       "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI",
     "idf_path":           "C:/Users/admin/esp/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/build",
@@ -1315,7 +1315,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [ "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lvgl_port", "lvgl__lvgl" ],
             "file": "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/main.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/my_platform.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/display.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/espnow_task.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/assets/ui_font_Chokokutai.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/components/ui_comp.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/components/ui_comp_button1.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/components/ui_comp_hook.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/fonts/ui_font_Chokokutai.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/screens/ui_Screen1.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/screens/ui_Screen2.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/ui.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/ui_helpers.c" ],
+            "sources": [ "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/main.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/my_platform.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/display.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/espnow_task.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/ui.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/ui_helpers.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/screens/ui_Screen1.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/screens/ui_Screen2.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/screens/ui_Screen3.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/components/ui_comp.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/components/ui_comp_button1.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/components/ui_comp_hook.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/images/ui_img_945321139.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/images/ui_img_686816875.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/images/ui_img_1471171794.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/images/ui_img_836209702.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/images/ui_img_1577682898.c", "C:/Users/admin/OneDrive/And-E/FINALcode/And-E UI/main/ui/fonts/ui_font_Chokokutai.c" ],
             "include_dirs": [ ".", "ui" ]
         },
         "mbedtls": {

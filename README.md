@@ -1,4 +1,9 @@
-# And-E Display - Final Code
+# Project-And-E
+Remote Control Car
+
+Competed in RC Classic 2025 at BCIT
+
+## And-E Display - Final Code
 
 This is the self-contained version of the ESP32 Square Line Studio display project with Bluepad32 support.
 
@@ -64,4 +69,3 @@ All dependencies are self-contained:
 - This project is completely self-contained and does not require the bluepad32 examples folder structure
 - Bluepad32 is referenced from the local `bluepad32/` directory
 - All Square Line Studio UI files are in `main/ui/`
-

@@ -52,3 +52,7 @@ void display_clear_screen2_cache(void);
 /* Screen3 cache management - enables controller input mapping to UI elements */
 void display_cache_screen3_objects(lv_obj_t *screen3, lv_obj_t *throttle_bar, lv_obj_t *brake_bar, lv_obj_t *slider1);
 void display_clear_screen3_cache(void);
+
+/* Connection status indicators - update icon blend modes on Screen1 */
+void display_update_controller_status(bool connected);
+void display_update_espnow_status(bool connected);

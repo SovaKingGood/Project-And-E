@@ -5,6 +5,8 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_HomeImage;
+lv_obj_t * uic_HomeButton;
 lv_obj_t * uic_Speed;
 lv_obj_t * uic_CurrentSpeed;
 lv_obj_t * uic_SpeedArc;
@@ -29,16 +31,16 @@ lv_obj_t * ui_MotorTemp = NULL;
 lv_obj_t * ui_SpeedArc = NULL;
 lv_obj_t * ui_CurrentSpeed = NULL;
 lv_obj_t * ui_Speed = NULL;
-lv_obj_t * ui_Button2 = NULL;
+lv_obj_t * ui_HomeButton = NULL;
+lv_obj_t * ui_HomeImage = NULL;
 lv_obj_t * ui_Slider1 = NULL;
-lv_obj_t * ui_Image1 = NULL;
 // event funtions
-void ui_event_Button2(lv_event_t * e)
+void ui_event_HomeButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Screen1_screen_init);
+        _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_Screen1_screen_init);
     }
 }
 
@@ -55,8 +57,18 @@ void ui_Screen3_screen_init(void)
     lv_obj_set_width(ui_ThrottleBar, 11);
     lv_obj_set_height(ui_ThrottleBar, 103);
     lv_obj_set_x(ui_ThrottleBar, 130);
-    lv_obj_set_y(ui_ThrottleBar, 15);
+    lv_obj_set_y(ui_ThrottleBar, 6);
     lv_obj_set_align(ui_ThrottleBar, LV_ALIGN_CENTER);
+    lv_obj_set_style_outline_color(ui_ThrottleBar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_ThrottleBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_ThrottleBar, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_ThrottleBar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_ThrottleBar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_ThrottleBar, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_ThrottleBar, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_ThrottleBar, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_x(ui_ThrottleBar, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_y(ui_ThrottleBar, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
     if(lv_obj_get_style_pad_top(ui_ThrottleBar, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_ThrottleBar,
@@ -64,8 +76,8 @@ void ui_Screen3_screen_init(void)
     ui_Throttle = lv_label_create(ui_Screen3);
     lv_obj_set_width(ui_Throttle, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Throttle, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Throttle, 128);
-    lv_obj_set_y(ui_Throttle, -50);
+    lv_obj_set_x(ui_Throttle, 130);
+    lv_obj_set_y(ui_Throttle, -58);
     lv_obj_set_align(ui_Throttle, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Throttle, "Throttle");
 
@@ -75,8 +87,18 @@ void ui_Screen3_screen_init(void)
     lv_obj_set_width(ui_BrakeBar, 11);
     lv_obj_set_height(ui_BrakeBar, 103);
     lv_obj_set_x(ui_BrakeBar, -130);
-    lv_obj_set_y(ui_BrakeBar, 15);
+    lv_obj_set_y(ui_BrakeBar, 6);
     lv_obj_set_align(ui_BrakeBar, LV_ALIGN_CENTER);
+    lv_obj_set_style_outline_color(ui_BrakeBar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_BrakeBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_BrakeBar, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_BrakeBar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_BrakeBar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_BrakeBar, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_BrakeBar, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_BrakeBar, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_x(ui_BrakeBar, -1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_y(ui_BrakeBar, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
     if(lv_obj_get_style_pad_top(ui_BrakeBar, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_BrakeBar,
@@ -84,20 +106,30 @@ void ui_Screen3_screen_init(void)
     ui_Brake = lv_label_create(ui_Screen3);
     lv_obj_set_width(ui_Brake, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Brake, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Brake, -130);
-    lv_obj_set_y(ui_Brake, -49);
+    lv_obj_set_x(ui_Brake, -131);
+    lv_obj_set_y(ui_Brake, -60);
     lv_obj_set_align(ui_Brake, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Brake, "Brake");
 
     ui_Panel2 = lv_obj_create(ui_Screen3);
-    lv_obj_set_width(ui_Panel2, 313);
+    lv_obj_set_width(ui_Panel2, 312);
     lv_obj_set_height(ui_Panel2, 41);
-    lv_obj_set_x(ui_Panel2, -1);
+    lv_obj_set_x(ui_Panel2, 0);
     lv_obj_set_y(ui_Panel2, -95);
     lv_obj_set_align(ui_Panel2, LV_ALIGN_CENTER);
     lv_obj_remove_flag(ui_Panel2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_Panel2, lv_color_hex(0x005CCD), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Panel2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_color(ui_Panel2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_Panel2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_Panel2, 7, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_Panel2, -4, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_Panel2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_Panel2, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_Panel2, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_Panel2, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_x(ui_Panel2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_y(ui_Panel2, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Voltage = lv_label_create(ui_Panel2);
     lv_obj_set_width(ui_Voltage, LV_SIZE_CONTENT);   /// 1
@@ -143,9 +175,38 @@ void ui_Screen3_screen_init(void)
     lv_obj_set_width(ui_SpeedArc, 121);
     lv_obj_set_height(ui_SpeedArc, 117);
     lv_obj_set_x(ui_SpeedArc, 0);
-    lv_obj_set_y(ui_SpeedArc, 11);
+    lv_obj_set_y(ui_SpeedArc, -4);
     lv_obj_set_align(ui_SpeedArc, LV_ALIGN_CENTER);
     lv_arc_set_value(ui_SpeedArc, 50);
+    lv_obj_set_style_radius(ui_SpeedArc, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_SpeedArc, lv_color_hex(0x87A3FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_SpeedArc, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_color(ui_SpeedArc, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_main_stop(ui_SpeedArc, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_stop(ui_SpeedArc, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui_SpeedArc, LV_GRAD_DIR_VER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_color(ui_SpeedArc, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_SpeedArc, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_SpeedArc, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_SpeedArc, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_SpeedArc, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_SpeedArc, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_SpeedArc, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_SpeedArc, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_x(ui_SpeedArc, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_offset_y(ui_SpeedArc, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_arc_color(ui_SpeedArc, lv_color_hex(0x931919), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_opa(ui_SpeedArc, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_width(ui_SpeedArc, 12, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_radius(ui_SpeedArc, 20, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_SpeedArc, lv_color_hex(0xB50000), LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_SpeedArc, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_color(ui_SpeedArc, lv_color_hex(0x760000), LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_main_stop(ui_SpeedArc, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_stop(ui_SpeedArc, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui_SpeedArc, LV_GRAD_DIR_VER, LV_PART_KNOB | LV_STATE_DEFAULT);
 
     ui_CurrentSpeed = lv_label_create(ui_SpeedArc);
     lv_obj_set_width(ui_CurrentSpeed, LV_SIZE_CONTENT);   /// 1
@@ -158,19 +219,36 @@ void ui_Screen3_screen_init(void)
     ui_Speed = lv_label_create(ui_SpeedArc);
     lv_obj_set_width(ui_Speed, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Speed, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Speed, 0);
-    lv_obj_set_y(ui_Speed, -19);
+    lv_obj_set_x(ui_Speed, -3);
+    lv_obj_set_y(ui_Speed, 46);
     lv_obj_set_align(ui_Speed, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Speed, "Speed");
 
-    ui_Button2 = lv_button_create(ui_Screen3);
-    lv_obj_set_width(ui_Button2, 41);
-    lv_obj_set_height(ui_Button2, 33);
-    lv_obj_set_x(ui_Button2, -126);
-    lv_obj_set_y(ui_Button2, 93);
-    lv_obj_set_align(ui_Button2, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Button2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_Button2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_HomeButton = lv_button_create(ui_Screen3);
+    lv_obj_set_width(ui_HomeButton, 106);
+    lv_obj_set_height(ui_HomeButton, 75);
+    lv_obj_set_x(ui_HomeButton, -104);
+    lv_obj_set_y(ui_HomeButton, 79);
+    lv_obj_set_align(ui_HomeButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_HomeButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_HomeButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_radius(ui_HomeButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_HomeButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_HomeButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_color(ui_HomeButton, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(ui_HomeButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_HomeButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_HomeButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_HomeImage = lv_image_create(ui_HomeButton);
+    lv_image_set_src(ui_HomeImage, &ui_img_1577682898);
+    lv_obj_set_width(ui_HomeImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_HomeImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_HomeImage, -41);
+    lv_obj_set_y(ui_HomeImage, 26);
+    lv_obj_set_align(ui_HomeImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_HomeImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_HomeImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_Slider1 = lv_slider_create(ui_Screen3);
     lv_slider_set_value(ui_Slider1, 0, LV_ANIM_OFF);
@@ -178,23 +256,13 @@ void ui_Screen3_screen_init(void)
     lv_obj_set_width(ui_Slider1, 150);
     lv_obj_set_height(ui_Slider1, 10);
     lv_obj_set_x(ui_Slider1, -1);
-    lv_obj_set_y(ui_Slider1, 85);
+    lv_obj_set_y(ui_Slider1, 94);
     lv_obj_set_align(ui_Slider1, LV_ALIGN_CENTER);
 
     //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
     if(lv_obj_get_style_pad_top(ui_Slider1, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_Slider1,
                                                                                               lv_obj_get_style_pad_right(ui_Slider1, LV_PART_MAIN) + 1, LV_PART_MAIN);
-    ui_Image1 = lv_image_create(ui_Screen3);
-    lv_image_set_src(ui_Image1, &ui_img_1577682898);
-    lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Image1, -125);
-    lv_obj_set_y(ui_Image1, 94);
-    lv_obj_set_align(ui_Image1, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    lv_obj_add_event_cb(ui_Button2, ui_event_Button2, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_HomeButton, ui_event_HomeButton, LV_EVENT_ALL, NULL);
     uic_ThrottleBar = ui_ThrottleBar;
     uic_Throttle = ui_Throttle;
     uic_BrakeBar = ui_BrakeBar;
@@ -206,6 +274,8 @@ void ui_Screen3_screen_init(void)
     uic_SpeedArc = ui_SpeedArc;
     uic_CurrentSpeed = ui_CurrentSpeed;
     uic_Speed = ui_Speed;
+    uic_HomeButton = ui_HomeButton;
+    uic_HomeImage = ui_HomeImage;
 
 }
 
@@ -238,8 +308,10 @@ void ui_Screen3_screen_destroy(void)
     ui_CurrentSpeed = NULL;
     uic_Speed = NULL;
     ui_Speed = NULL;
-    ui_Button2 = NULL;
+    uic_HomeButton = NULL;
+    ui_HomeButton = NULL;
+    uic_HomeImage = NULL;
+    ui_HomeImage = NULL;
     ui_Slider1 = NULL;
-    ui_Image1 = NULL;
 
 }

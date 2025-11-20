@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* ========================================================================
+ * HARDWARE CONFIGURATION
+ * ======================================================================== */
+
 /* ===================== SPI BUS (shared by ST7789 + XPT2046) ===================== */
 #define DISPLAY_SPI_HOST        SPI3_HOST   /* VSPI */
 
@@ -39,10 +43,14 @@
 #define TOUCH_TASK_PRIO         1           /* Lowest priority - not time critical */
 #define TOUCH_TASK_STACK        1000
 
+/* ========================================================================
+ * TASK CONFIGURATION
+ * ======================================================================== */
+
 /* =============================== LVGL CONFIG =============================== */
 #define LVGL_TICK_PERIOD_MS     50          /* Slower updates - 20fps is fine for status display */
 #define LVGL_TASK_PRIORITY      15          /* Higher than draw task (3) to prevent suspension, but below WiFi (23) */
-#define LVGL_TASK_STACK_SIZE    8192        /* 8KB - balanced for UI stability + Bluetooth heap (was 10KB, too much heap) */
+#define LVGL_TASK_STACK_SIZE    16384       /* 16KB - plenty of headroom for complex UI operations + controller input */
 #define TASK_CORE_DISPLAY       1           /* CPU 1 - isolated from Bluetooth/WiFi */
 #ifdef CONFIG_SPIRAM
   #define LVGL_BUFFER_PIXELS    (DISPLAY_WIDTH * 20)
@@ -59,6 +67,10 @@ typedef enum {
     DRIVE_MODE_DRIVE = 2,
     DRIVE_MODE_ECO   = 3,
 } drive_mode_t;
+
+/* ========================================================================
+ * TIMING CONFIGURATION
+ * ======================================================================== */
 
 /* =============================== ESP-NOW CONFIG =============================== */
 #define ESPNOW_ENABLED              1           /* was 0 — enable radio path */

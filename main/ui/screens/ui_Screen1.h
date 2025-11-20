@@ -24,6 +24,8 @@ extern lv_obj_t * ui_SettingsImage;
 extern void ui_event_StartButton(lv_event_t * e);
 extern lv_obj_t * ui_StartButton;
 extern lv_obj_t * ui_StartImage;
+extern lv_obj_t * ui_ControllerStatus;
+extern lv_obj_t * ui_WiFiStatus;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_AndEImage;
 extern lv_obj_t * uic_InfoButton;
@@ -31,6 +33,8 @@ extern lv_obj_t * uic_InfoImage;
 extern lv_obj_t * uic_SettingsButton;
 extern lv_obj_t * uic_SettingsImage;
 extern lv_obj_t * uic_StartImage;
+extern lv_obj_t * uic_ControllerStatus;
+extern lv_obj_t * uic_WiFiStatus;
 
 #ifdef __cplusplus
 } /*extern "C"*/

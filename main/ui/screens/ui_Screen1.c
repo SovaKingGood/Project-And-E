@@ -5,6 +5,8 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_WiFiStatus;
+lv_obj_t * uic_ControllerStatus;
 lv_obj_t * uic_StartImage;
 lv_obj_t * uic_SettingsImage;
 lv_obj_t * uic_SettingsButton;
@@ -20,6 +22,8 @@ lv_obj_t * ui_SettingsButton = NULL;
 lv_obj_t * ui_SettingsImage = NULL;
 lv_obj_t * ui_StartButton = NULL;
 lv_obj_t * ui_StartImage = NULL;
+lv_obj_t * ui_ControllerStatus = NULL;
+lv_obj_t * ui_WiFiStatus = NULL;
 // event funtions
 void ui_event_InfoButton(lv_event_t * e)
 {
@@ -54,15 +58,14 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_bg_grad_dir(ui_Screen1, LV_GRAD_DIR_VER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_AndEImage = lv_image_create(ui_Screen1);
-    lv_image_set_src(ui_AndEImage, &ui_img_945321139);
+    lv_image_set_src(ui_AndEImage, &ui_img_592052946);
     lv_obj_set_width(ui_AndEImage, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_AndEImage, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_AndEImage, 0);
-    lv_obj_set_y(ui_AndEImage, -39);
+    lv_obj_set_y(ui_AndEImage, -40);
     lv_obj_set_align(ui_AndEImage, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_AndEImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_remove_flag(ui_AndEImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_image_set_scale(ui_AndEImage, 80);
 
     ui_Buttons = lv_obj_create(ui_Screen1);
     lv_obj_set_width(ui_Buttons, 328);
@@ -82,10 +85,10 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_outline_pad(ui_Buttons, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_InfoButton = lv_button_create(ui_Buttons);
-    lv_obj_set_width(ui_InfoButton, 103);
-    lv_obj_set_height(ui_InfoButton, 92);
-    lv_obj_set_x(ui_InfoButton, 104);
-    lv_obj_set_y(ui_InfoButton, 44);
+    lv_obj_set_width(ui_InfoButton, 88);
+    lv_obj_set_height(ui_InfoButton, 115);
+    lv_obj_set_x(ui_InfoButton, 113);
+    lv_obj_set_y(ui_InfoButton, 32);
     lv_obj_set_align(ui_InfoButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_InfoButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_InfoButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -102,17 +105,17 @@ void ui_Screen1_screen_init(void)
     lv_image_set_src(ui_InfoImage, &ui_img_686816875);
     lv_obj_set_width(ui_InfoImage, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_InfoImage, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_InfoImage, 12);
-    lv_obj_set_y(ui_InfoImage, 0);
+    lv_obj_set_x(ui_InfoImage, 15);
+    lv_obj_set_y(ui_InfoImage, 30);
     lv_obj_set_align(ui_InfoImage, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_InfoImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_remove_flag(ui_InfoImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_image_set_scale(ui_InfoImage, 310);
 
     ui_SettingsButton = lv_button_create(ui_Buttons);
-    lv_obj_set_width(ui_SettingsButton, 103);
+    lv_obj_set_width(ui_SettingsButton, 86);
     lv_obj_set_height(ui_SettingsButton, 92);
-    lv_obj_set_x(ui_SettingsButton, -106);
+    lv_obj_set_x(ui_SettingsButton, -112);
     lv_obj_set_y(ui_SettingsButton, 44);
     lv_obj_set_align(ui_SettingsButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_SettingsButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
@@ -130,17 +133,17 @@ void ui_Screen1_screen_init(void)
     lv_image_set_src(ui_SettingsImage, &ui_img_1471171794);
     lv_obj_set_width(ui_SettingsImage, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_SettingsImage, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_SettingsImage, -13);
-    lv_obj_set_y(ui_SettingsImage, 0);
+    lv_obj_set_x(ui_SettingsImage, -16);
+    lv_obj_set_y(ui_SettingsImage, 20);
     lv_obj_set_align(ui_SettingsImage, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_SettingsImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_remove_flag(ui_SettingsImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_StartButton = lv_button_create(ui_Buttons);
-    lv_obj_set_width(ui_StartButton, 103);
-    lv_obj_set_height(ui_StartButton, 92);
-    lv_obj_set_x(ui_StartButton, 1);
-    lv_obj_set_y(ui_StartButton, 44);
+    lv_obj_set_width(ui_StartButton, 112);
+    lv_obj_set_height(ui_StartButton, 115);
+    lv_obj_set_x(ui_StartButton, -1);
+    lv_obj_set_y(ui_StartButton, 33);
     lv_obj_set_align(ui_StartButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_StartButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_StartButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -158,10 +161,33 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_StartImage, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_StartImage, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_StartImage, 1);
-    lv_obj_set_y(ui_StartImage, 0);
+    lv_obj_set_y(ui_StartImage, 10);
     lv_obj_set_align(ui_StartImage, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_StartImage, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_remove_flag(ui_StartImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_ControllerStatus = lv_image_create(ui_Screen1);
+    lv_image_set_src(ui_ControllerStatus, &ui_img_1768070411);
+    lv_obj_set_width(ui_ControllerStatus, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_ControllerStatus, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_ControllerStatus, -68);
+    lv_obj_set_y(ui_ControllerStatus, -96);
+    lv_obj_set_align(ui_ControllerStatus, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ControllerStatus, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_ControllerStatus, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_blend_mode(ui_ControllerStatus, LV_BLEND_MODE_SUBTRACTIVE, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_WiFiStatus = lv_image_create(ui_Screen1);
+    lv_image_set_src(ui_WiFiStatus, &ui_img_493105991);
+    lv_obj_set_width(ui_WiFiStatus, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_WiFiStatus, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_WiFiStatus, -130);
+    lv_obj_set_y(ui_WiFiStatus, -96);
+    lv_obj_set_align(ui_WiFiStatus, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_WiFiStatus, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_WiFiStatus, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_blend_mode(ui_WiFiStatus, LV_BLEND_MODE_SUBTRACTIVE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(ui_WiFiStatus, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_InfoButton, ui_event_InfoButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StartButton, ui_event_StartButton, LV_EVENT_ALL, NULL);
@@ -171,6 +197,8 @@ void ui_Screen1_screen_init(void)
     uic_SettingsButton = ui_SettingsButton;
     uic_SettingsImage = ui_SettingsImage;
     uic_StartImage = ui_StartImage;
+    uic_ControllerStatus = ui_ControllerStatus;
+    uic_WiFiStatus = ui_WiFiStatus;
 
 }
 
@@ -194,5 +222,9 @@ void ui_Screen1_screen_destroy(void)
     ui_StartButton = NULL;
     uic_StartImage = NULL;
     ui_StartImage = NULL;
+    uic_ControllerStatus = NULL;
+    ui_ControllerStatus = NULL;
+    uic_WiFiStatus = NULL;
+    ui_WiFiStatus = NULL;
 
 }

@@ -1,6 +1,9 @@
 /**
  * @file espnow_task.h
  * @brief ESP-NOW Communication Task
+ * 
+ * NOTE: For high-level documentation of data structures and system flow,
+ *       see main.c which provides a human-readable overview.
  */
 #ifndef ESPNOW_TASK_H
 #define ESPNOW_TASK_H
@@ -12,7 +15,7 @@
 #include "esp_timer.h"
 #include "system_config.h"
 
-/* Who initiated a change (for future merge logic) */
+/* Control source (for future merge logic) */
 typedef enum {
     CTRL_SOURCE_CONTROLLER = 0,
     CTRL_SOURCE_DISPLAY    = 1,

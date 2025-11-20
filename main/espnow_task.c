@@ -71,6 +71,10 @@ static void espnow_recv_cb(const esp_now_recv_info_t *ri, const uint8_t *data, i
 
             /* Push latest telemetry into UI model (no LVGL calls here) */
             display_set_telemetry_state(&t);
+            
+            /* Update ESP-NOW connection status icon (connected) */
+            extern void display_update_espnow_status(bool connected);
+            display_update_espnow_status(true);
 
             ESP_LOGI(TAG, "📡 Telemetry received: rpm=%ld batt=%.2fV gyro=(%.1f,%.1f,%.1f) accel=(%.3f,%.3f,%.3f)",
                      (long)t.rpm, (double)t.batt_mv/1000.0,
@@ -109,10 +113,27 @@ static esp_err_t espnow_add_peer(void) {
 /* Task: send at configured rate; only when data_updated */
 static void espnow_communication_task(void* arg) {
     (void)arg;
+    extern void display_update_espnow_status(bool connected);
     TickType_t last = xTaskGetTickCount();
     const TickType_t period = pdMS_TO_TICKS(ESPNOW_UPDATE_INTERVAL_MS);
+    bool was_connected = false;
+    
     for (;;) {
         vTaskDelayUntil(&last, period);
+        
+        /* Check ESP-NOW connection status (timeout = 3 seconds without telemetry) */
+        uint32_t now = esp_timer_get_time() / 1000;
+        bool is_connected = (now - last_telemetry_received) < 3000;
+        
+        /* Update status icon only when connection state changes */
+        if (is_connected != was_connected) {
+            display_update_espnow_status(is_connected);
+            was_connected = is_connected;
+            if (!is_connected) {
+                ESP_LOGW(TAG, "ESP-NOW connection lost (no telemetry for 3s)");
+            }
+        }
+        
         if (!data_updated) continue;
 
         if (data_mutex && xSemaphoreTake(data_mutex, 0) == pdTRUE) {

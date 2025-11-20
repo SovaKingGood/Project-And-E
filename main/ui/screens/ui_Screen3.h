@@ -26,10 +26,10 @@ extern lv_obj_t * ui_MotorTemp;
 extern lv_obj_t * ui_SpeedArc;
 extern lv_obj_t * ui_CurrentSpeed;
 extern lv_obj_t * ui_Speed;
-extern void ui_event_Button2(lv_event_t * e);
-extern lv_obj_t * ui_Button2;
+extern void ui_event_HomeButton(lv_event_t * e);
+extern lv_obj_t * ui_HomeButton;
+extern lv_obj_t * ui_HomeImage;
 extern lv_obj_t * ui_Slider1;
-extern lv_obj_t * ui_Image1;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_ThrottleBar;
 extern lv_obj_t * uic_Throttle;
@@ -42,6 +42,8 @@ extern lv_obj_t * uic_MotorTemp;
 extern lv_obj_t * uic_SpeedArc;
 extern lv_obj_t * uic_CurrentSpeed;
 extern lv_obj_t * uic_Speed;
+extern lv_obj_t * uic_HomeButton;
+extern lv_obj_t * uic_HomeImage;
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -32,10 +32,12 @@ extern "C" {
 extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_945321139);    // assets/And-E_AI.png
+LV_IMG_DECLARE(ui_img_592052946);    // assets/And-E_AI3.png
 LV_IMG_DECLARE(ui_img_686816875);    // assets/icons8-info-48.png
 LV_IMG_DECLARE(ui_img_1471171794);    // assets/icons8-settings-48.png
 LV_IMG_DECLARE(ui_img_836209702);    // assets/icons8-start-button-64.png
+LV_IMG_DECLARE(ui_img_1768070411);    // assets/icons8-ps-controller-48.png
+LV_IMG_DECLARE(ui_img_493105991);    // assets/icons8-wi-fi-48.png
 LV_IMG_DECLARE(ui_img_1577682898);    // assets/icons8-home-24.png
 
 // FONTS

@@ -8,10 +8,13 @@ set(UI_SOURCES
     "ui/components/ui_comp.c"
     "ui/components/ui_comp_button1.c"
     "ui/components/ui_comp_hook.c"
+    "ui/images/ui_img_592052946.c"
     "ui/images/ui_img_945321139.c"
     "ui/images/ui_img_686816875.c"
     "ui/images/ui_img_1471171794.c"
     "ui/images/ui_img_836209702.c"
+    "ui/images/ui_img_1768070411.c"
+    "ui/images/ui_img_493105991.c"
     "ui/images/ui_img_1577682898.c"
     "ui/fonts/ui_font_Chokokutai.c"
 )

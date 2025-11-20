@@ -61,12 +61,21 @@ static void my_platform_on_device_disconnected(uni_hid_device_t* d) {
     printf("╚════════════════════════════════════════════════════════════╝\n");
     printf("\n");
     ESP_LOGI("PLAT", "If reconnecting fails, ensure controller is disconnected from PS4/other devices");
+    
+    /* Update UI to show controller is disconnected */
+    extern void display_update_controller_status(bool connected);
+    display_update_controller_status(false);
 }
 
 static uni_error_t my_platform_on_device_ready(uni_hid_device_t* d) {
     my_platform_instance_t* ins = get_my_platform_instance(d);
     ins->gamepad_seat = GAMEPAD_SEAT_A;
     trigger_event_on_gamepad(d);
+    
+    /* Update UI to show controller is connected */
+    extern void display_update_controller_status(bool connected);
+    display_update_controller_status(true);
+    
     return UNI_ERROR_SUCCESS;
 }
 

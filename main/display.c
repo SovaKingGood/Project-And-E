@@ -44,13 +44,18 @@ static const size_t   TRANS_SIZE     = 4096;                 // internal DMA bou
 static esp_lcd_panel_io_handle_t  s_panel_io = NULL;
 static esp_lcd_panel_handle_t     s_panel    = NULL;
 
-/* LVGL timers for periodic UI updates */
-static lv_timer_t *s_label_update_timer = NULL;
-static lv_timer_t *s_screen3_update_timer = NULL;
+/* ONE TIMER for all UI updates */
+static lv_timer_t *s_ui_update_timer = NULL;
 
-/* Flags to completely disable timer updates when not on specific screens */
-static volatile bool s_screen2_active = false;
-static volatile bool s_screen3_active = false;
+/* Track which screen is currently active */
+typedef enum {
+    ACTIVE_SCREEN_NONE = 0,
+    ACTIVE_SCREEN_1,
+    ACTIVE_SCREEN_2,
+    ACTIVE_SCREEN_3
+} active_screen_t;
+
+static volatile active_screen_t s_active_screen = ACTIVE_SCREEN_1;
 
 /* Health monitoring variables */
 static uint32_t last_successful_update = 0;
@@ -78,10 +83,13 @@ static SemaphoreHandle_t    s_ui_model_mutex = NULL;
 /* Forward declarations for internal LVGL event handlers (run in LVGL task) */
 static void display_info_button_event_cb(lv_event_t *e);
 static void display_start_button_event_cb(lv_event_t *e);
-static void display_button2_event_cb(lv_event_t *e);
 static void screen2_event_cb(lv_event_t *e);
 static void screen2_button1_event_cb(lv_event_t *e);
 static void screen3_event_cb(lv_event_t *e);
+
+/* Forward declarations for screen update functions */
+static void update_screen2(void);
+static void update_screen3(void);
 
 /* Screen change debouncing - prevents rapid successive screen loads */
 static lv_obj_t *s_last_screen_load = NULL;
@@ -288,9 +296,7 @@ esp_err_t display_init(void) {
         /* Attach additional lightweight button event callbacks (LVGL task context) */
         extern lv_obj_t *ui_InfoButton;
         extern lv_obj_t *ui_StartButton;
-        extern lv_obj_t *ui_Button2;
         extern lv_obj_t *ui_Screen2;
-        extern lv_obj_t *ui_Info;
 
         if (ui_InfoButton) {
             lv_obj_add_event_cb(ui_InfoButton,
@@ -306,12 +312,7 @@ esp_err_t display_init(void) {
                                 NULL);
         }
 
-        if (ui_Button2) {
-            lv_obj_add_event_cb(ui_Button2,
-                                display_button2_event_cb,
-                                LV_EVENT_CLICKED,
-                                NULL);
-        }
+        /* ui_Button2 removed from UI - no longer needed */
 
         /* Hook into Screen2 to cache/clear UI object pointers for timer safety */
         if (ui_Screen2) {
@@ -457,30 +458,15 @@ static void display_start_button_event_cb(lv_event_t *e)
     /* Screen3 will be loaded - event handler will enable controller input timer */
 }
 
-static void display_button2_event_cb(lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    
-    if (code == LV_EVENT_CLICKED) {
-        ESP_LOGI(TAG, "🔴 Button2 CLICKED - back to Screen1");
-    }
-}
+/* display_button2_event_cb removed - ui_Button2 no longer exists in UI */
 
 /* Screen2's Button1 event handler - clears cache BEFORE leaving Screen2 */
 static void screen2_button1_event_cb(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     
-    /* Clear cache on PRESSING (before the click completes) */
-    if (code == LV_EVENT_PRESSING || code == LV_EVENT_PRESSED) {
-        ESP_LOGI(TAG, "🔴 Button1 PRESSED - disabling Screen2 timer NOW");
-        s_screen2_active = false;  /* Disable timer IMMEDIATELY */
-        return;
-    }
-    
     if (code == LV_EVENT_CLICKED) {
-        /* Button1 on Screen2 navigates back to Screen1 - clear everything */
-        ESP_LOGI(TAG, "🔴 Button1 CLICKED - clearing Screen2 cache completely");
+        ESP_LOGI(TAG, "Button1 clicked - returning to Screen1");
         display_clear_screen2_cache();
     }
 }
@@ -494,28 +480,23 @@ static void screen2_event_cb(lv_event_t *e)
     extern lv_obj_t *ui_Info;
 
     if (code == LV_EVENT_SCREEN_LOAD_START) {
-        /* Screen2 is about to become active - enable timer */
-        ESP_LOGI(TAG, "🟢 Screen2 SCREEN_LOAD_START - enabling timer");
+        ESP_LOGI(TAG, "Screen2 LOAD_START");
         if (ui_Screen2 && ui_Info) {
             display_cache_screen2_objects(ui_Screen2, ui_Info);
         }
     } else if (code == LV_EVENT_SCREEN_LOADED) {
-        /* Screen2 is now fully loaded and active - ensure timer is enabled */
-        ESP_LOGI(TAG, "🟢 Screen2 SCREEN_LOADED - timer should be active");
-        if (ui_Screen2 && ui_Info && !s_screen2_active) {
+        ESP_LOGI(TAG, "Screen2 LOADED");
+        if (ui_Screen2 && ui_Info && s_active_screen != ACTIVE_SCREEN_2) {
             display_cache_screen2_objects(ui_Screen2, ui_Info);
         }
     } else if (code == LV_EVENT_SCREEN_UNLOAD_START) {
-        /* Screen2 is about to be unloaded - disable timer IMMEDIATELY */
-        ESP_LOGI(TAG, "🔴 Screen2 SCREEN_UNLOAD_START - disabling timer");
+        ESP_LOGI(TAG, "Screen2 UNLOAD_START");
         display_clear_screen2_cache();
     } else if (code == LV_EVENT_SCREEN_UNLOADED) {
-        /* Screen2 is now unloaded - ensure timer is disabled */
-        ESP_LOGI(TAG, "🔴 Screen2 SCREEN_UNLOADED - timer should be disabled");
+        ESP_LOGI(TAG, "Screen2 UNLOADED");
         display_clear_screen2_cache();
     } else if (code == LV_EVENT_DELETE) {
-        /* Screen2 is being deleted - disable timer */
-        ESP_LOGI(TAG, "🔴 Screen2 DELETE - disabling timer");
+        ESP_LOGI(TAG, "Screen2 DELETE");
         display_clear_screen2_cache();
     }
 }
@@ -531,39 +512,20 @@ static void screen3_event_cb(lv_event_t *e)
     extern lv_obj_t *ui_Slider1;
 
     if (code == LV_EVENT_SCREEN_LOAD_START) {
-        ESP_LOGI(TAG, "🟢 Screen3 SCREEN_LOAD_START - enabling controller input timer");
+        ESP_LOGI(TAG, "Screen3 LOAD_START");
         if (ui_Screen3 && ui_ThrottleBar && ui_BrakeBar && ui_Slider1) {
             display_cache_screen3_objects(ui_Screen3, ui_ThrottleBar, ui_BrakeBar, ui_Slider1);
         }
     } else if (code == LV_EVENT_SCREEN_UNLOAD_START) {
-        ESP_LOGI(TAG, "🔴 Screen3 SCREEN_UNLOAD_START - disabling controller input timer");
+        ESP_LOGI(TAG, "Screen3 UNLOAD_START");
         display_clear_screen3_cache();
     } else if (code == LV_EVENT_DELETE) {
-        ESP_LOGI(TAG, "🔴 Screen3 DELETE - disabling controller input timer");
+        ESP_LOGI(TAG, "Screen3 DELETE");
         display_clear_screen3_cache();
     }
 }
 
-/* Screen3's Button2 event handler - clears cache BEFORE leaving Screen3 */
-/* NOTE: Currently unused - Button2 event is handled by display_button2_event_cb */
-/* Kept for future use if we need Screen3-specific button handling */
-/*
-static void screen3_button2_event_cb(lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    
-    if (code == LV_EVENT_PRESSING || code == LV_EVENT_PRESSED) {
-        ESP_LOGI(TAG, "🔴 Screen3 Button2 PRESSED - disabling controller input timer NOW");
-        s_screen3_active = false;
-        return;
-    }
-    
-    if (code == LV_EVENT_CLICKED) {
-        ESP_LOGI(TAG, "🔴 Screen3 Button2 CLICKED - clearing Screen3 cache completely");
-        display_clear_screen3_cache();
-    }
-}
-*/
+/* Removed unused screen3_button2_event_cb - no longer needed with unified timer */
 
 /* Monitoring task to detect system hangs */
 static void system_monitor_task(void* pv) {
@@ -593,46 +555,46 @@ static void system_monitor_task(void* pv) {
     }
 }
 
-/* ================= LABEL UPDATE TIMER (LVGL CONTEXT) ================= */
-/* Runs inside LVGL task via lv_timer_handler() - NO lvgl_port_lock needed */
+/* ================= UNIFIED UI UPDATE TIMER (LVGL CONTEXT) ================= */
+/* ONE timer for all screens - runs inside LVGL task via lv_timer_handler() */
+/* NO lvgl_port_lock needed - already in LVGL context */
 
-/* Local cached pointers to UI objects - updated when screens are loaded */
-static lv_obj_t *s_cached_screen2 = NULL;
-static lv_obj_t *s_cached_info_label = NULL;
+/* Cached UI object pointers */
+static lv_obj_t *s_cached_info_label = NULL;      /* Screen2 */
+static lv_obj_t *s_cached_throttle_bar = NULL;    /* Screen3 */
+static lv_obj_t *s_cached_brake_bar = NULL;       /* Screen3 */
+static lv_obj_t *s_cached_slider1 = NULL;         /* Screen3 */
 
-static lv_obj_t *s_cached_screen3 = NULL;
-static lv_obj_t *s_cached_throttle_bar = NULL;
-static lv_obj_t *s_cached_brake_bar = NULL;
-static lv_obj_t *s_cached_slider1 = NULL;
-
-static void label_update_timer_cb(lv_timer_t *timer)
+static void ui_update_timer_cb(lv_timer_t *timer)
 {
     (void)timer;
 
+    /* Always update heartbeat (proves LVGL is alive) */
+    last_successful_update = esp_timer_get_time() / 1000;
+
+    /* Route to appropriate screen handler */
+    if (s_active_screen == ACTIVE_SCREEN_2) {
+        update_screen2();
+    } else if (s_active_screen == ACTIVE_SCREEN_3) {
+        update_screen3();
+    }
+    /* Screen1 needs no updates */
+}
+
+/* ================= SCREEN 2 UPDATE (INFO/STATUS DISPLAY) ================= */
+static void update_screen2(void)
+{
     static uint32_t counter = 0;
     static uint8_t  cached_mac[6] = {0};
     static bool     mac_cached = false;
-    /* Pre-allocated static buffer to avoid stack overflow */
-    static char display_buffer[256];  /* Static allocation - NOT on stack! */
+    static char display_buffer[256];  /* Static buffer */
 
-    /* Always update heartbeat timestamp */
-    uint32_t current_time = esp_timer_get_time() / 1000;
-    last_successful_update = current_time;
-
-    /* CRITICAL: Immediately exit if Screen2 is not active - DO NOTHING */
-    /* This is the ONLY check we need - all others can cause deadlocks during transitions */
-    if (!s_screen2_active) {
-        return;  /* Screen2 not active - timer is completely disabled */
-    }
-
-    /* Secondary check: ensure we have cached pointers (should always be true if flag is set) */
-    if (!s_cached_screen2 || !s_cached_info_label) {
-        ESP_LOGW(TAG, "Screen2 active flag set but pointers NULL - clearing flag");
-        s_screen2_active = false;
+    /* Validate cached pointer */
+    if (!s_cached_info_label) {
         return;
     }
 
-    /* Snapshot UI model under its own mutex (NO LVGL APIs here) */
+    /* Snapshot UI model data */
     bool controller_valid = false;
     bool telemetry_valid  = false;
     uint32_t controller_ts = 0;
@@ -642,8 +604,11 @@ static void label_update_timer_cb(lv_timer_t *timer)
     int32_t rpm = 0;
     uint16_t batt_mv = 0;
 
-    if (s_ui_model_mutex &&
-        xSemaphoreTake(s_ui_model_mutex, pdMS_TO_TICKS(5)) == pdTRUE) {
+    if (!s_ui_model_mutex) {
+        return;
+    }
+
+    if (xSemaphoreTake(s_ui_model_mutex, pdMS_TO_TICKS(5)) == pdTRUE) {
         if (s_ui_model.controller_valid) {
             lx = s_ui_model.controller.left_stick_x;
             ly = s_ui_model.controller.left_stick_y;
@@ -661,14 +626,11 @@ static void label_update_timer_cb(lv_timer_t *timer)
         }
         xSemaphoreGive(s_ui_model_mutex);
     } else {
-        /* Failed to get mutex - log warning but don't block */
-        ESP_LOGW(TAG, "Screen2 timer: failed to get UI model mutex");
+        return;  /* Skip if mutex busy */
     }
 
-    bool controller_connected = controller_valid &&
-                                is_timestamp_recent(controller_ts, 5000);
-    bool ande_connected = telemetry_valid &&
-                          is_timestamp_recent(telemetry_ts, 5000);
+    bool controller_connected = controller_valid && is_timestamp_recent(controller_ts, 5000);
+    bool ande_connected = telemetry_valid && is_timestamp_recent(telemetry_ts, 5000);
 
     /* Cache MAC address - only read once at startup */
     if (!mac_cached) {
@@ -716,44 +678,28 @@ static void label_update_timer_cb(lv_timer_t *timer)
                  "Cnt:%lu", (unsigned long)counter);
     }
 
-    /* Update the label - already in LVGL task context, no locking needed */
-    /* If we got here, s_screen2_active is true, so it's safe to update */
+    /* Update label */
     lv_label_set_text(s_cached_info_label, display_buffer);
     counter++;
 }
 
-/* ================= SCREEN3 UPDATE TIMER (LVGL CONTEXT) ================= */
-/* Updates controller inputs on Screen3 - throttle, brake, steering */
-static void screen3_update_timer_cb(lv_timer_t *timer)
+/* ================= SCREEN 3 UPDATE (CONTROLLER INPUT DISPLAY) ================= */
+static void update_screen3(void)
 {
-    (void)timer;
-
-    /* Always update heartbeat */
-    uint32_t current_time = esp_timer_get_time() / 1000;
-    last_successful_update = current_time;
-
-    /* If Screen3 is not active, skip all updates */
-    if (!s_screen3_active) {
+    /* Validate cached pointers */
+    if (!s_cached_throttle_bar || !s_cached_brake_bar || !s_cached_slider1) {
         return;
     }
 
-    /* Validate cached objects */
-    if (!s_cached_screen3 || !s_cached_throttle_bar || !s_cached_brake_bar || !s_cached_slider1) {
-        return;
-    }
-
-    /* Read controller data from shared UI model (same pattern as Screen2) */
+    /* Read controller data from UI model */
     if (!s_ui_model_mutex) {
         return;
     }
 
-    /* Try to acquire mutex with timeout */
     if (xSemaphoreTake(s_ui_model_mutex, pdMS_TO_TICKS(5)) != pdTRUE) {
-        ESP_LOGW(TAG, "Screen3 timer: Failed to acquire UI model mutex");
-        return;
+        return;  /* Skip if mutex busy */
     }
 
-    /* Copy data while holding mutex */
     bool controller_valid = s_ui_model.controller_valid;
     int16_t left_stick_x = s_ui_model.controller.left_stick_x;
     uint8_t right_trigger = s_ui_model.controller.right_trigger;  // R2 = throttle
@@ -761,24 +707,20 @@ static void screen3_update_timer_cb(lv_timer_t *timer)
 
     xSemaphoreGive(s_ui_model_mutex);
 
-    /* If no valid controller data, set everything to neutral/zero */
+    /* If no controller, set to neutral */
     if (!controller_valid) {
         lv_bar_set_value(s_cached_throttle_bar, 0, LV_ANIM_OFF);
         lv_bar_set_value(s_cached_brake_bar, 0, LV_ANIM_OFF);
-        lv_slider_set_value(s_cached_slider1, 0, LV_ANIM_OFF);
+        lv_slider_set_value(s_cached_slider1, 50, LV_ANIM_OFF);  // Center
         return;
     }
 
-    /* Map controller values to UI widgets:
-     * - R2 trigger (0-255) -> ThrottleBar (0-100)
-     * - L2 trigger (0-255) -> BrakeBar (0-100)
-     * - Left stick X (-512 to +511) -> Slider1 (0-100, 50=center)
-     */
+    /* Map controller values to UI (0-100 range) */
     int32_t throttle_percent = (right_trigger * 100) / 255;
     int32_t brake_percent = (left_trigger * 100) / 255;
-    int32_t steering_percent = ((left_stick_x + 512) * 100) / 1024;  // Map -512..511 to 0..100
+    int32_t steering_percent = ((left_stick_x + 512) * 100) / 1024;
 
-    /* Clamp values to valid ranges */
+    /* Clamp to valid range */
     if (throttle_percent < 0) throttle_percent = 0;
     if (throttle_percent > 100) throttle_percent = 100;
     if (brake_percent < 0) brake_percent = 0;
@@ -786,62 +728,45 @@ static void screen3_update_timer_cb(lv_timer_t *timer)
     if (steering_percent < 0) steering_percent = 0;
     if (steering_percent > 100) steering_percent = 100;
 
-    /* Update UI widgets - already in LVGL task context, no locking needed */
+    /* Update UI widgets */
     lv_bar_set_value(s_cached_throttle_bar, throttle_percent, LV_ANIM_OFF);
     lv_bar_set_value(s_cached_brake_bar, brake_percent, LV_ANIM_OFF);
     lv_slider_set_value(s_cached_slider1, steering_percent, LV_ANIM_OFF);
 }
 
-/* Called after Screen2 is initialized to cache UI object pointers */
+/* Screen cache management - simple and clean */
 void display_cache_screen2_objects(lv_obj_t *screen2, lv_obj_t *info_label)
 {
-    s_cached_screen2 = screen2;
+    (void)screen2;  /* Not needed anymore */
     s_cached_info_label = info_label;
-    s_screen2_active = true;  /* Enable timer updates */
-    ESP_LOGI(TAG, "✅ Screen2 ACTIVE - timer enabled");
+    s_active_screen = ACTIVE_SCREEN_2;
+    ESP_LOGI(TAG, "Screen2 active");
 }
 
-/* Called before Screen2 is destroyed to prevent timer from accessing deleted objects */
 void display_clear_screen2_cache(void)
 {
-    s_screen2_active = false;  /* IMMEDIATELY disable timer updates */
-    s_cached_screen2 = NULL;
+    s_active_screen = ACTIVE_SCREEN_1;
     s_cached_info_label = NULL;
-    ESP_LOGI(TAG, "❌ Screen2 INACTIVE - timer disabled");
+    ESP_LOGI(TAG, "Screen2 inactive");
 }
 
-/* Called after Screen3 is initialized to cache UI object pointers */
 void display_cache_screen3_objects(lv_obj_t *screen3, lv_obj_t *throttle_bar, lv_obj_t *brake_bar, lv_obj_t *slider1)
 {
-    s_cached_screen3 = screen3;
+    (void)screen3;  /* Not needed anymore */
     s_cached_throttle_bar = throttle_bar;
     s_cached_brake_bar = brake_bar;
     s_cached_slider1 = slider1;
-    s_screen3_active = true;  /* Enable timer updates */
-    
-    /* Resume the timer when Screen3 becomes active */
-    if (s_screen3_update_timer) {
-        lv_timer_resume(s_screen3_update_timer);
-    }
-    
-    ESP_LOGI(TAG, "✅ Screen3 ACTIVE - controller input timer enabled");
+    s_active_screen = ACTIVE_SCREEN_3;
+    ESP_LOGI(TAG, "Screen3 active");
 }
 
-/* Called before Screen3 is destroyed to prevent timer from accessing deleted objects */
 void display_clear_screen3_cache(void)
 {
-    s_screen3_active = false;  /* IMMEDIATELY disable timer updates */
-    
-    /* Pause the timer when Screen3 is not active to save CPU */
-    if (s_screen3_update_timer) {
-        lv_timer_pause(s_screen3_update_timer);
-    }
-    
-    s_cached_screen3 = NULL;
+    s_active_screen = ACTIVE_SCREEN_1;
     s_cached_throttle_bar = NULL;
     s_cached_brake_bar = NULL;
     s_cached_slider1 = NULL;
-    ESP_LOGI(TAG, "❌ Screen3 INACTIVE - controller input timer disabled");
+    ESP_LOGI(TAG, "Screen3 inactive");
 }
 
 void display_start_label_task(void) {
@@ -862,35 +787,21 @@ void display_start_label_task(void) {
         ESP_LOGW(TAG, "Failed to create system monitor task");
     }
 
-    /* Create LVGL timers for UI updates - run in LVGL task, no locks needed */
-    ESP_LOGI(TAG, "Creating LVGL timers for UI updates");
+    /* Create unified UI update timer - runs in LVGL task, no locks needed */
+    ESP_LOGI(TAG, "Creating unified UI update timer");
 
     if (lvgl_port_lock(0)) {  /* Safe during init */
-        /* Screen2 label update timer (200ms) */
-        s_label_update_timer = lv_timer_create(label_update_timer_cb,
-                                               LABEL_UPDATE_INTERVAL_MS,
-                                               NULL);
-        
-        /* Screen3 timer - currently does nothing */
-        s_screen3_update_timer = lv_timer_create(screen3_update_timer_cb,
-                                                 50,
-                                                 NULL);
-        
+        /* ONE timer for all screens - 50ms for responsive controller input */
+        s_ui_update_timer = lv_timer_create(ui_update_timer_cb, 50, NULL);
         lvgl_port_unlock();
     } else {
-        ESP_LOGE(TAG, "Failed to acquire LVGL lock to create UI update timers");
+        ESP_LOGE(TAG, "Failed to acquire LVGL lock to create UI update timer");
     }
 
-    if (s_label_update_timer == NULL) {
-        ESP_LOGE(TAG, "CRITICAL: Failed to create label update timer!");
+    if (s_ui_update_timer == NULL) {
+        ESP_LOGE(TAG, "CRITICAL: Failed to create UI update timer!");
     } else {
-        ESP_LOGI(TAG, "Label update timer created successfully (200ms)");
-    }
-    
-    if (s_screen3_update_timer == NULL) {
-        ESP_LOGE(TAG, "CRITICAL: Failed to create Screen3 update timer!");
-    } else {
-        ESP_LOGI(TAG, "Screen3 controller input timer created successfully (50ms)");
+        ESP_LOGI(TAG, "UI update timer created successfully (50ms, screen-aware)");
     }
 }
 
@@ -900,8 +811,59 @@ display_health_t display_get_health(void) {
         .last_successful_update_ms = last_successful_update,
         .consecutive_failures = 0,
         .uptime_seconds = current_time / 1000,
-        .is_healthy = (s_label_update_timer != NULL) &&
+        .is_healthy = (s_ui_update_timer != NULL) &&
                      (current_time - last_successful_update < 5000)
     };
     return health;
+}
+
+/* ================= CONNECTION STATUS INDICATORS ================= */
+/* Update controller connection status icon on Screen1 */
+void display_update_controller_status(bool connected)
+{
+    extern lv_obj_t *ui_ControllerStatus;
+    
+    if (!ui_ControllerStatus) {
+        return;
+    }
+    
+    if (!lvgl_port_lock(10)) {
+        ESP_LOGW(TAG, "Failed to lock display for controller status update");
+        return;
+    }
+    
+    if (connected) {
+        /* Controller connected - set blend mode to NORMAL (icon visible/bright) */
+        lv_obj_set_style_blend_mode(ui_ControllerStatus, LV_BLEND_MODE_NORMAL, LV_PART_MAIN | LV_STATE_DEFAULT);
+    } else {
+        /* Controller disconnected - set blend mode to SUBTRACTIVE (icon dimmed) */
+        lv_obj_set_style_blend_mode(ui_ControllerStatus, LV_BLEND_MODE_SUBTRACTIVE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    
+    lvgl_port_unlock();
+}
+
+/* Update ESP-NOW connection status icon on Screen1 */
+void display_update_espnow_status(bool connected)
+{
+    extern lv_obj_t *ui_WiFiStatus;
+    
+    if (!ui_WiFiStatus) {
+        return;
+    }
+    
+    if (!lvgl_port_lock(10)) {
+        ESP_LOGW(TAG, "Failed to lock display for ESP-NOW status update");
+        return;
+    }
+    
+    if (connected) {
+        /* ESP-NOW connected - set blend mode to NORMAL (icon visible/bright) */
+        lv_obj_set_style_blend_mode(ui_WiFiStatus, LV_BLEND_MODE_NORMAL, LV_PART_MAIN | LV_STATE_DEFAULT);
+    } else {
+        /* ESP-NOW disconnected - set blend mode to SUBTRACTIVE (icon dimmed) */
+        lv_obj_set_style_blend_mode(ui_WiFiStatus, LV_BLEND_MODE_SUBTRACTIVE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    
+    lvgl_port_unlock();
 }
